@@ -1,0 +1,39 @@
+<!--
+ * @Author: Summer
+ * @LastEditors: Summer
+ * @Description: 
+ * @Date: 2021-07-15 09:21:04 +0800
+ * @LastEditTime: 2021-07-15 11:25:26 +0800
+ * @FilePath: /loader3d/src/index.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loader3d</title>
+    <style>
+        #test {
+            
+        }
+    </style>
+</head>
+<body>
+    <div id="test1" style="width: 500px; height: 500px;"></div>
+    
+    <div id="test2" style="width: 500px; height: 500px;"></div>
+</body>
+<script>
+    window.onload = function(){
+        window.loader3d1 = new Loader3d(document.getElementById("test1"));
+        loader3d1.addFBX("key", "http://10.9.16.12:5501/examples/models/fbx/Samba Dancing.fbx")
+
+
+
+        window.loader3d2 = new Loader3d(document.getElementById("test2"));
+        loader3d2.addFBX("key", "http://10.9.16.12:5501/static/chip_key.fbx")
+    }
+   
+</script>
+</html>

@@ -3,7 +3,7 @@
  * @LastEditors: Summer
  * @Description: 基于 THREE.js 做的简易封装，使用简单代码就可以实现加载 3D 模型文件到 页面上
  * @Date: 2021-07-15 09:20:52 +0800
- * @LastEditTime: 2021-07-15 11:25:10 +0800
+ * @LastEditTime: 2021-07-15 12:29:22 +0800
  * @FilePath: /loader3d/src/index.ts
  */
 import * as THREE from 'three';
@@ -23,6 +23,8 @@ import { GCodeLoader } from 'three/examples/jsm/loaders/GCodeLoader'
 import { LDrawLoader } from 'three/examples/jsm/loaders/LDrawLoader'
 import { TDSLoader } from 'three/examples/jsm/loaders/TDSLoader'
 import { TiltLoader } from 'three/examples/jsm/loaders/TiltLoader'
+import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
+import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 export type LoadFile = THREE.Object3D | THREE.Group
 
@@ -47,7 +49,14 @@ export default class Loader3d {
     public readonly Objs: Map<string, LoadFile> = new Map();
 
     constructor(private readonly div: HTMLDivElement){
-        this.scene.background = new THREE.Color( 0xa0a0a0 );
+
+        let directionalLight = new THREE.DirectionalLight(0xffffff, 1); //模拟远处类似太阳的光源
+        directionalLight.position.set(0, 100, 0).normalize();
+        this.scene.add(directionalLight);
+        
+        let ambient = new THREE.AmbientLight(0xffffff, 1); //AmbientLight,影响整个场景的光源
+        ambient.position.set(0, 0, 0);
+        this.scene.add(ambient);
 
         this.renderer.shadowMap.enabled = true;
         this.renderer.setPixelRatio(window.devicePixelRatio);
@@ -61,8 +70,9 @@ export default class Loader3d {
         window.addEventListener("resize", this.render.bind(this));
     }
     
-    public async addObj(name:string, url:string, cb:Add3DFileCallBack = _ => 0){
-        let obj:THREE.Group = await new OBJLoader().loadAsync(url);
+    public async addObj(name:string, mtlurl:string, objurl:string, cb:Add3DFileCallBack = _ => 0){
+        let mtl:MTLLoader.MaterialCreator = await new MTLLoader().loadAsync(mtlurl);
+        let obj:THREE.Group = await new OBJLoader().setMaterials(mtl).loadAsync(objurl);
         cb(obj);
         this.scene.add(obj);
         this.Objs.set(name, obj);
@@ -122,6 +132,13 @@ export default class Loader3d {
         cb(obj);
         this.scene.add(obj);
         this.Objs.set(name, obj);
+    }
+    
+    public async addGLTF(name:string, url:string, cb:Add3DFileCallBack = _ => 0){
+        let obj:GLTF = await new GLTFLoader().loadAsync(url);
+        cb(obj.scene);
+        this.scene.add(obj.scene);
+        this.Objs.set(name, obj.scene);
     }
 
     public render(){

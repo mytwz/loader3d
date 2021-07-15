@@ -3,7 +3,7 @@
  * @LastEditors: Summer
  * @Description: 基于 THREE.js 做的简易封装，使用简单代码就可以实现加载 3D 模型文件到 页面上
  * @Date: 2021-07-15 09:20:52 +0800
- * @LastEditTime: 2021-07-15 12:29:22 +0800
+ * @LastEditTime: 2021-07-15 18:35:07 +0800
  * @FilePath: /loader3d/src/index.ts
  */
 import * as THREE from 'three';
@@ -70,7 +70,14 @@ export default class Loader3d {
         window.addEventListener("resize", this.render.bind(this));
     }
     
-    public async addObj(name:string, mtlurl:string, objurl:string, cb:Add3DFileCallBack = _ => 0){
+    public async addObj(name:string, objurl:string, cb:Add3DFileCallBack = _ => 0){
+        let obj:THREE.Group = await new OBJLoader().loadAsync(objurl);
+        cb(obj);
+        this.scene.add(obj);
+        this.Objs.set(name, obj);
+    }
+
+    public async addObjAndMtl(name:string, mtlurl:string, objurl:string, cb:Add3DFileCallBack = _ => 0){
         let mtl:MTLLoader.MaterialCreator = await new MTLLoader().loadAsync(mtlurl);
         let obj:THREE.Group = await new OBJLoader().setMaterials(mtl).loadAsync(objurl);
         cb(obj);
